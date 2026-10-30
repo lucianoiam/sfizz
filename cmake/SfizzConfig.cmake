@@ -50,7 +50,7 @@ if(WIN32)
 endif()
 
 # Set macOS compatibility level
-if(APPLE)
+if(APPLE AND NOT CMAKE_OSX_DEPLOYMENT_TARGET)
     set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13")
 endif()
 
