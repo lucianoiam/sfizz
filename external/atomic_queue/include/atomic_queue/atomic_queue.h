@@ -11,7 +11,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
-#include <type_traits>
 #include <utility>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,6 +122,12 @@ constexpr T nil() noexcept {
     static_assert(std::atomic<T>::is_always_lock_free, "Queue element type T is not atomic. Use AtomicQueue2/AtomicQueueB2 for such element types.");
 #endif
     return {};
+}
+
+template<class T>
+inline void destroy_n(T* p, unsigned n) noexcept {
+    for(auto q = p + n; p != q;)
+        (p++)->~T();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -355,7 +360,7 @@ class AtomicQueue : public AtomicQueueCommon<AtomicQueue<T, SIZE, NIL, MINIMIZE_
     static constexpr bool spsc_ = SPSC;
     static constexpr bool maximize_throughput_ = MAXIMIZE_THROUGHPUT;
 
-    alignas(CACHE_LINE_SIZE) std::atomic<T> elements_[size_] = {}; // Empty elements are NIL.
+    alignas(CACHE_LINE_SIZE) std::atomic<T> elements_[size_];
 
     T do_pop(unsigned tail) noexcept {
         std::atomic<T>& q_element = details::map<SHUFFLE_BITS>(elements_, tail % size_);
@@ -372,9 +377,8 @@ public:
 
     AtomicQueue() noexcept {
         assert(std::atomic<T>{NIL}.is_lock_free()); // Queue element type T is not atomic. Use AtomicQueue2/AtomicQueueB2 for such element types.
-        if(details::nil<T>() != NIL)
-            for(auto& element : elements_)
-                element.store(NIL, X);
+        for(auto p = elements_, q = elements_ + size_; p != q; ++p)
+            p->store(NIL, X);
     }
 
     AtomicQueue(AtomicQueue const&) = delete;
@@ -400,13 +404,13 @@ class AtomicQueue2 : public AtomicQueueCommon<AtomicQueue2<T, SIZE, MINIMIZE_CON
 
     T do_pop(unsigned tail) noexcept {
         unsigned index = details::remap_index<SHUFFLE_BITS>(tail % size_);
-        return Base::template do_pop_any(states_[index], elements_[index]);
+        return Base::do_pop_any(states_[index], elements_[index]);
     }
 
     template<class U>
     void do_push(U&& element, unsigned head) noexcept {
         unsigned index = details::remap_index<SHUFFLE_BITS>(head % size_);
-        Base::template do_push_any(std::forward<U>(element), states_[index], elements_[index]);
+        Base::do_push_any(std::forward<U>(element), states_[index], elements_[index]);
     }
 
 public:
@@ -462,8 +466,8 @@ public:
         , size_(std::max(details::round_up_to_power_of_2(size), 1u << (SHUFFLE_BITS * 2)))
         , elements_(AllocatorElements::allocate(size_)) {
         assert(std::atomic<T>{NIL}.is_lock_free()); // Queue element type T is not atomic. Use AtomicQueue2/AtomicQueueB2 for such element types.
-        for(auto p = elements_, q = elements_ + size_; p < q; ++p)
-            p->store(NIL, X);
+        std::uninitialized_fill_n(elements_, size_, NIL);
+        assert(get_allocator() == allocator); // The standard requires the original and rebound allocators to manage the same state.
     }
 
     AtomicQueueB(AtomicQueueB&& b) noexcept
@@ -479,12 +483,14 @@ public:
     }
 
     ~AtomicQueueB() noexcept {
-        if(elements_)
+        if(elements_) {
+            details::destroy_n(elements_, size_);
             AllocatorElements::deallocate(elements_, size_); // TODO: This must be noexcept, static_assert that.
+        }
     }
 
     A get_allocator() const noexcept {
-        return *this;
+        return *this; // The standard requires implicit conversion between rebound allocators.
     }
 
     void swap(AtomicQueueB& b) noexcept {
@@ -529,13 +535,13 @@ class AtomicQueueB2 : private std::allocator_traits<A>::template rebind_alloc<un
 
     T do_pop(unsigned tail) noexcept {
         unsigned index = details::remap_index<SHUFFLE_BITS>(tail & (size_ - 1));
-        return Base::template do_pop_any(states_[index], elements_[index]);
+        return Base::do_pop_any(states_[index], elements_[index]);
     }
 
     template<class U>
     void do_push(U&& element, unsigned head) noexcept {
         unsigned index = details::remap_index<SHUFFLE_BITS>(head & (size_ - 1));
-        Base::template do_push_any(std::forward<U>(element), states_[index], elements_[index]);
+        Base::do_push_any(std::forward<U>(element), states_[index], elements_[index]);
     }
 
     template<class U>
@@ -561,9 +567,9 @@ public:
         , size_(std::max(details::round_up_to_power_of_2(size), 1u << (SHUFFLE_BITS * 2)))
         , states_(allocate_<AtomicState>())
         , elements_(allocate_<T>()) {
-        for(auto p = states_, q = states_ + size_; p < q; ++p)
-            p->store(Base::EMPTY, X);
+        std::uninitialized_fill_n(states_, size_, Base::EMPTY);
         A a = get_allocator();
+        assert(a == allocator); // The standard requires the original and rebound allocators to manage the same state.
         for(auto p = elements_, q = elements_ + size_; p < q; ++p)
             std::allocator_traits<A>::construct(a, p);
     }
@@ -587,12 +593,13 @@ public:
             for(auto p = elements_, q = elements_ + size_; p < q; ++p)
                 std::allocator_traits<A>::destroy(a, p);
             deallocate_(elements_);
+            details::destroy_n(states_, size_);
             deallocate_(states_);
         }
     }
 
     A get_allocator() const noexcept {
-        return *this;
+        return *this; // The standard requires implicit conversion between rebound allocators.
     }
 
     void swap(AtomicQueueB2& b) noexcept {
