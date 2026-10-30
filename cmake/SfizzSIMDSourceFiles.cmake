@@ -13,11 +13,15 @@ macro(sfizz_add_simd_sources SOURCES_VAR PREFIX)
         # on GCC, it requires to set ISA support flags on individual files
         # to be able to use the intrinsics
         if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+            set(SFIZZ_AVX_FLAGS "-mavx")
+            if(CMAKE_OSX_ARCHITECTURES MATCHES ";")
+                set(SFIZZ_AVX_FLAGS "-Xarch_x86_64 -mavx")
+            endif()
             set_source_files_properties(
                 ${PREFIX}/sfizz/effects/impl/ResonantStringAVX.cpp
                 ${PREFIX}/sfizz/effects/impl/ResonantArrayAVX.cpp
                 ${PREFIX}/sfizz/simd/HelpersAVX.cpp
-                PROPERTIES COMPILE_FLAGS "-mavx")
+                PROPERTIES COMPILE_FLAGS "${SFIZZ_AVX_FLAGS}")
         endif()
     endif()
 endmacro()
