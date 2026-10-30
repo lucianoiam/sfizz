@@ -1,31 +1,34 @@
-.TH sfizz_jack 1 "@MAN_TODAY@" "@CMAKE_PROJECT_VERSION@" "sfizz_jack man page"
+.TH sfizz_jack 1 "@MAN_TODAY@" "@CMAKE_PROJECT_VERSION@" "sfizz"
 .SH NAME
-sfizz_jack \- Launch a sfizz instance as a JACK client
+sfizz_jack \- launch a sfizz instance as a JACK client
 .SH SYNOPSIS
-sfizz_jack [FILE] [OPTIONS...]
+.B sfizz_jack
+[\fIFILE\fR] [\fIOPTIONS\fR...]
 .SH DESCRIPTION
 sfizz_jack wraps the sfizz SFZ library in a JACK client that can be controlled by a text interface.
 .SH OPTIONS
-.IP FILE
-An optional SFZ file name to load at firsts
-.IP "--client_name"
+.IP \fIFILE\fR
+An optional SFZ file name to load on startup
+.IP "\fB--client_name\fR"
 Name for the JACK client
-.IP "--num_voices NUMBER"
+.IP "\fB--num_voices\fR \fINUMBER\fR"
 Change the maximum polyphony
-.IP "--preload_size NUMBER"
+.IP "\fB--preload_size\fR \fINUMBER\fR"
 Bytes to preload in cache for samples
-.IP "--state"
-Output the state in the JACK loop
-.IP "--jack_autoconnect"
+.IP "\fB--state\fR"
+Periodically output the state of the synth
+.IP "\fB--jack_autoconnect\fR"
 Autoconnect the JACK outputs
 .SH TEXT INTERFACE
 It is possible it interact with the JACK client through the standard input.
 The possible commands are
-.IP "load_instrument FILE"
+.IP "load_instrument \fIFILE\fR"
 Load an instrument
-.IP "set_preload_size NUMBER"
-Set the number of bytes to preload in cache for samples
-.IP "set_voices NUMBER"
+.IP "set_oversampling \fINUMBER\fR"
+Change the oversampling factor
+.IP "set_preload_size \fINUMBER\fR"
+Set the number of bytes to preload in the cache for samples
+.IP "set_voices \fINUMBER\fR"
 Change the maximum polyphony
 .IP quit
 Quit

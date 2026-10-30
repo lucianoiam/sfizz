@@ -226,13 +226,15 @@ std::vector<std::string> stringTokenize(const std::string& str)
 
 void cliThreadProc()
 {
+    const std::string whitespace = " \t";
     while (!shouldClose) {
         std::cout << "\n> ";
 
         std::string command;
         std::getline(std::cin, command);
-        std::size_t pos = command.find(" ");
-        std::string kw = command.substr(0, pos);
+        std::size_t start = command.length()? command.find_first_not_of(whitespace): 0;
+        std::size_t pos = command.find_first_of(whitespace, start);
+        std::string kw = command.substr(start, pos - start);
         std::string args = command.substr(pos + 1);
         std::vector<std::string> tokens = stringTokenize(args);
 
@@ -264,7 +266,7 @@ void cliThreadProc()
             } catch (...) {
                 std::cout << "ERROR: Can't set num of voices!\n";
             }
-        } else if (kw == "quit") {
+        } else if (kw == "quit" || !std::cin) {
             shouldClose = true;
         } else if (kw.size() > 0) {
             std::cout << "ERROR: Unknown command '" << kw << "'!\n";

@@ -4,9 +4,9 @@
 [![build obs]](https://build.opensuse.org/package/show/home:sfztools:sfizz:develop/sfizz)
 [![Discord Badge Image]](https://discord.gg/3ArE9Mw)
 
-[![SFZv1 Status Image]](https://sfz.tools/sfizz/development/status/opcodes/?v=1)
-[![SFZv2 Status Image]](https://sfz.tools/sfizz/development/status/opcodes/?v=2)
-[![ARIA Status Image]](https://sfz.tools/sfizz/development/status/opcodes/?v=aria)
+[![SFZv1 Status Image]](https://sfztools.github.io/sfizz/development/status/opcodes/?v=1)
+[![SFZv2 Status Image]](https://sfztools.github.io/sfizz/development/status/opcodes/?v=2)
+[![ARIA Status Image]](https://sfztools.github.io/sfizz/development/status/opcodes/?v=aria)
 
 SFZ parser and synth c++ library and JACK standalone client,
 please check [our website] for more details, or [our wiki] for further information.
@@ -107,21 +107,21 @@ The sfizz library also uses in some subprojects:
 [fmidi]:                 https://github.com/jpcima/fmidi/
 [libsamplerate]:         http://www.mega-nerd.com/SRC/
 [libsndfile]:            http://www.mega-nerd.com/libsndfile/
-[our website]:           https://sfz.tools/sfizz/
-[our wiki]:              https://sfz.tools/sfizz-wiki/
+[our website]:           https://sfztools.github.io/sfizz/
+[our wiki]:              https://sfztools.github.io/sfizz-wiki/
 [releases]:              https://github.com/sfztools/sfizz/releases/
 [Carla]:                 https://kx.studio/Applications:Carla
 [Ardour]:                https://ardour.org/
-[API]:                   https://sfz.tools/sfizz/api/
+[API]:                   https://sfztools.github.io/sfizz/api/
 [Open Collective]:       https://opencollective.com/sfztools
-[build from source]:     https://sfz.tools/sfizz/development/build/
+[build from source]:     https://sfztools.github.io/sfizz/development/build/
 [Discord Badge Image]:   https://img.shields.io/discord/587748534321807416?label=discord&logo=discord
 [build actions]:         https://github.com/sfztools/sfizz/actions/workflows/build.yml/badge.svg?branch=develop
 [build obs]:             https://build.opensuse.org/projects/home:sfztools:sfizz:develop/packages/sfizz/badge.svg
 [OBS]:                   https://software.opensuse.org//download.html?project=home%3Asfztools%3Asfizz&package=sfizz
-[SFZv1 Status Image]:    https://sfz.tools/assets/img/sfizz/badge_sfzv1.svg
-[SFZv2 Status Image]:    https://sfz.tools/assets/img/sfizz/badge_sfzv2.svg
-[ARIA Status Image]:     https://sfz.tools/assets/img/sfizz/badge_aria.svg
+[SFZv1 Status Image]:    https://sfztools.github.io/assets/img/sfizz/badge_sfzv1.svg
+[SFZv2 Status Image]:    https://sfztools.github.io/assets/img/sfizz/badge_sfzv2.svg
+[ARIA Status Image]:     https://sfztools.github.io/assets/img/sfizz/badge_aria.svg
 
 [AppVeyor Build Status]: https://img.shields.io/appveyor/ci/sfztools/sfizz.svg?label=Windows&style=popout&logo=appveyor
 [Travis Build Status]:   https://img.shields.io/travis/com/sfztools/sfizz.svg?label=Linux&style=popout&logo=travis
